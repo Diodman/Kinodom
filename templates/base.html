@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}
+    Menu
+    {% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .navbar-custom {
+            background-color: #FFA500;
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .btn-outline-light {
+            color: black;
+        }
+        .navbar-custom .navbar-toggler-icon {
+            background-color: black;
+        }
+    </style>
+</head>
+<body style="background-color: black;">
+
+    <!-- Меню -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <a href="/" class="navbar-brand">Кинодом</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Кино</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/TopSerial">Сериалы</a>
+                </li>
+            </ul>
+            <form class="form-inline ml-auto">
+                <input class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Поиск">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Найти</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/Vhod">Вход</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Login">Регистрация</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+     <div class="container">
+        {% block content %}
+            {% if show_movies %}
+                {% include "SortirovkaKino.html" %}
+            {% else %}
+                {% include "SortirovkaSerial.html" %}
+            {% endif %}
+        {% endblock %}
+        {% block content2 %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+     document.addEventListener("DOMContentLoaded", function() {
+        var sortBy = document.getElementById('sortBy');
+        sortBy.addEventListener('change', function() {
+            var selectedOption = sortBy.value;
+            sortMovies(selectedOption);
+        });
+
+        function sortMovies(option) {
+            var container = document.getElementById('moviesContainer');
+            var movies = Array.from(container.querySelectorAll('.card'));
+
+            if (option === 'no') {
+                // Вывод карточек в порядке их номеров от 1 до 5 (Пока что оставлю так, по возможности как-то изменить)
+                movies.sort(function(a, b) {
+                    var aValue = parseInt(a.dataset.number);
+                    var bValue = parseInt(b.dataset.number);
+                    return aValue - bValue;
+                });
+            } else
+                movies.sort(function(a, b) {
+                    var aValue, bValue;
+
+                    switch(option) {
+                        case 'title':
+                            aValue = a.querySelector('.card-title').textContent.toLowerCase();
+                            bValue = b.querySelector('.card-title').textContent.toLowerCase();
+                            return aValue.localeCompare(bValue);
+                        case 'rating':
+                            aValue = parseFloat(a.dataset.rating);
+                            bValue = parseFloat(b.dataset.rating);
+                            return bValue - aValue;
+                        case 'votes':
+                            aValue = parseInt(a.dataset.votes);
+                            bValue = parseInt(b.dataset.votes);
+                            return bValue - aValue;
+                        case 'newest':
+                        case 'oldest':
+                            aValue = parseInt(a.dataset.year);
+                            bValue = parseInt(b.dataset.year);
+                            return option === 'newest' ? bValue - aValue : aValue - bValue;
+                        default:
+                            return 0;
+                    }
+                });
+            }
+
+            movies.forEach(function(movie) {
+                container.appendChild(movie);
+            });
+        }
+     });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Кинодом
+{% endblock %}
+
+{% if current_user.is_authenticated %}
+
+{% block content2 %}
+<div class="col-md-9">
+    <h2 id="new">Топ рейтинга</h2>
+    <div id="moviesContainer">
+       {% for cinema in cinemas %}
+        <div class="card mb-3">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img src="{{ cinema.image }}" class="card-img" alt="{{ cinema.label }}" width="150" height="304">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ cinema.label }}</h5>
+                        <p class="card-text">Год выпуска: {{ cinema.year }}</p>
+                        <p class="card-text">Страна: {{ cinema.country }}</p>
+                        <p class="card-text">Жанр: {{ cinema.genre }}</p>
+                        <p class="card-text">Рейтинг: {{ cinema.age_rating }}</p>
+                        <a href="{{url_for('Film_by_id', id=cinema.id)}}" class="btn btn-primary">{{ cinema.note }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

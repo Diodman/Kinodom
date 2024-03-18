@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Кинодом{% endblock %}
+
+{% block content %}
+{% for cinema in item %}
+  <header>
+    <h1>1+1</h1>
+    <img src="{{ item.image }}" alt="Постер фильма" width="222" height="333">
+  </header>
+  <section>
+    <h2>Информация</h2>
+    <p>Год выпуска: {{ item.year }}</p>
+    <p>Страна выпуска: {{ item.country }}</p>
+    <p>Жанры: {{ item.genre }}</p>
+    <p>Режиссер: ...</p>
+    <p>Продюсер: ...</p>
+    <p>Композитор: ...</p>
+    <p>Возрастное ограничение: {{ item.age_rating }}</p>
+    <p>Длительность: 120 мин</p>
+    <p>Трейлер: <a href="trailer.mp4">Смотреть трейлер</a></p>
+  </section>
+  <section>
+    <h2>Описание</h2>
+    <p>...</p>
+  </section>
+  <section>
+    <h2>Отзывы</h2>
+    <p>...</p>
+  </section>
+{% endfor %}
+{% endblock %}
