@@ -1,19 +1,12 @@
 # -*- coding: UTF-8 -*-
 import os
 import uuid
-
-
-from flask import Flask, render_template
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
+import settings
 from flask_login import LoginManager
-from flask import request, redirect, url_for
-from flask_login import login_required, login_user, logout_user
+from flask import Flask, g, render_template
 
 
 
-from models import db_session, WorkingFilms, Cinema, ApplicationUser, Reviews, ParticationCinema
 
 
 import settings
@@ -28,6 +21,7 @@ SHOW_MOVIES = True;
 # Отображение фильмов на главной странице
 @app.route('/')
 def TopMovie():
+    from models import db_session, Cinema, WorkingFilms, ParticationCinema
     cinemas = db_session.query(Cinema).all()
     return render_template('MovieSelections/TopMovie.html', cinemas=cinemas, show_movies=SHOW_MOVIES)
 
@@ -53,12 +47,13 @@ def PopularSerial():
 
 @app.route('/Film/<int:id>/')
 def Film_by_id(id):
+    from models import db_session, Cinema
     item = db_session.query(Cinema).filter(Cinema.id == id).first()
     return render_template('SaytMovie/Film.html', item = item)
 
-@app.route('/Login')
-def Login():
-    return render_template('Login/Login.html')
+##@app.route('/Login')
+##def Login():
+##    return render_template('Login/Login.html')
 
 @app.route('/Vhod')
 def Vhod():
@@ -68,18 +63,38 @@ def Vhod():
 def main(page_name):
     return render_template(page_name+'.html')
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('/'))
 
+##@app.route('/Login', methods = ['GET', 'POST'])
+##def register():
+##    if request.method == 'GET':
+##        return render_template('Login/Login.html')
+##    login = request.form.get('username')
+##    password = request.form.get('password')
+##    user = User(login = login, password = password)
+##    db_session.add(user)
+##    db_session.commit()
+##    login_user(user)
+##    return render_template('Login/Login.html')
+##
+##@app.route('/logout')
+##@login_required
+##def logout():
+##    logout_user()
+##    return redirect(url_for('TopMovie'))
+##
+##
+##@app.after_request
+##def redirect_to_sign(response):
+##    if response.status_code == 401:
+##        return redirect(url_for('Login'))
+##    return response
 
-@app.after_request
-def redirect_to_sign(response):
-    if response.status_code == 401:
-        return redirect(url_for('/Login'))
-    return response
+@manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
 
 if __name__ == "__main__":
+    from werkzeug.middleware.shared_data import SharedDataMiddleware
+    from controller import *
     app.run(host='0.0.0.0', port=5057, debug=True)

@@ -45,9 +45,12 @@
                     <a class="nav-link" href="/Vhod">Вход</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/Login">Регистрация</a>
+                    <a class="nav-link" href="/Register">Регистрация</a>
                 </li>
             </ul>
+            {% if current_user.is_authenticated %}
+            <p>Name: {{current_user.login}}</p>
+            {% endif %}
         </div>
     </nav>
 

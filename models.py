@@ -4,12 +4,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship, query_expression
 from sqlalchemy.sql import func
 from database import Base, db_session, engine as db_engine
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import datetime
 from flask_login import UserMixin
 from eng import manager
-import datetime
-
 
 
 class WorkingFilms(Base):
@@ -94,19 +91,25 @@ class Reviews(Base):
 ##    number_negative = Column(Integer)
 
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    login = db.Column(db.String(32), unique=True)
-    password = db.Column(db.String(64))
-    is_premium = db.Column(db.Boolean)
+class User(Base, UserMixin):
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    login = Column(String(32), unique=True)
+    password = Column(String(64))
+
 
 def init_db():
     # import all modules here that might define models so that
-    # they will be registered properly on the metadata.  Otherwise
+    # they will be registered properly on the metadAata.  Otherwise
     # you will have to import them first before calling init_db()
     from database import engine
     Base.metadata.create_all(bind=engine)
     db_session.commit()
+
+@manager.user_loader
+def load_user(user_id):
+    from models import User
+    return User.query.get(user_id)
 
 def print_schema(table_class):
     from sqlalchemy.schema import CreateTable, CreateColumn
@@ -119,13 +122,9 @@ def print_columns(table_class, *attrNames):
                             for attrName in attrNames if hasattr(c, attrName)
                )))
 
-@manager.user.loader
-def loud_user(user_id):
-    return User.query.get(user_id)
+
 
 if __name__ == "__main__":
     init_db()
-    d=db_session.query(Cinema).filter(Cinema.id==1).first()
-    print(d)
     #print_columns(Payment, "created")
     #print_schema(SoltButton)
