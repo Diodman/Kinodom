@@ -21,8 +21,10 @@
                         <p class="card-text">Год выпуска: {{ cinema.year }}</p>
                         <p class="card-text">Страна: {{ cinema.country }}</p>
                         <p class="card-text">Жанр: {{ cinema.genre }}</p>
-                        <p class="card-text">Рейтинг: {{ cinema.age_rating }}</p>
-                        <a href="{{url_for('Film_by_id', id=cinema.id)}}" class="btn btn-primary">{{ cinema.note }}</a>
+                        <p class="card-text">Возрастной рейтинг: {{cinema.age_rating}}</p>
+                        <p class="card-text">Время: {{cinema.trailer_link}}</p>
+                        <p class="card-text">Рейтинг: {{ cinema.note }}</p>
+                        <a href="{{url_for('Film_by_id', id=cinema.id)}}" class="btn btn-primary">Подробнее</a>
                     </div>
                 </div>
             </div>

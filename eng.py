@@ -22,7 +22,7 @@ SHOW_MOVIES = True;
 @app.route('/')
 def TopMovie():
     from models import db_session, Cinema, WorkingFilms, ParticationCinema
-    cinemas = db_session.query(Cinema).all()
+    cinemas = db_session.query(Cinema).filter(Cinema.cinema_option == 'False').order_by(Cinema.note.desc()).limit(5).all()
     return render_template('MovieSelections/TopMovie.html', cinemas=cinemas, show_movies=SHOW_MOVIES)
 
 @app.route('/NewMovie')
@@ -35,7 +35,9 @@ def PopularMovies():
 
 @app.route('/TopSerial')
 def TopSerial():
-    return render_template('SeriesSelections/TopSerial.html', show_movies=not SHOW_MOVIES)
+    from models import db_session, Cinema, WorkingFilms, ParticationCinema
+    cinemas = db_session.query(Cinema).filter(Cinema.cinema_option == 'True').all()
+    return render_template('MovieSelections/TopMovie.html', cinemas=cinemas, show_movies=SHOW_MOVIES)
 
 @app.route('/NSerial')
 def NSerial():
@@ -47,9 +49,10 @@ def PopularSerial():
 
 @app.route('/Film/<int:id>/')
 def Film_by_id(id):
-    from models import db_session, Cinema
-    item = db_session.query(Cinema).filter(Cinema.id == id).first()
-    return render_template('SaytMovie/Film.html', item = item)
+    from models import db_session, Cinema, WorkingFilms
+    cinema = db_session.query(Cinema).filter(Cinema.id == id).first()
+    return render_template('SaytMovie/Film.html', cinema=cinema)
+
 
 ##@app.route('/Login')
 ##def Login():

@@ -1,32 +1,193 @@
 {% extends "base.html" %}
 
 {% block title %}Кинодом{% endblock %}
+{% block style %}
+.navbar-custom {
+    background-color: #FFA500;
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .btn-outline-light {
+    color: black;
+}
+.navbar-custom .navbar-toggler-icon {
+    background-color: black;
+}
+
+/* Стили для отзывов */
+.review {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+.review .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+.review .details {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.review .name {
+    font-weight: bold;
+    margin-right: 5px;
+}
+.review .rating {
+    color: #ff9800; /* Оранжевый цвет */
+    font-weight: bold;
+}
+/* Стили для формы отзыва */
+#userReviewForm {
+    margin-top: 20px;
+}
+#userReviewForm textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+/* Новые стили */
+.movie-details {
+    display: flex;
+    margin-bottom: 50px;
+}
+
+.movie-poster {
+    flex: 0 0 30%;
+    margin-right: 20px;
+}
+
+.movie-poster img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.movie-info {
+    flex: 1;
+}
+
+.movie-info h2 {
+    margin-top: 0;
+}
+
+.movie-info p {
+    margin-bottom: 10px;
+}
+
+.movie-trailer {
+    margin-top: 20px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+}
+.button:hover {
+    background-color: #45a049;
+}
+{% endblock %}
 
 {% block content %}
-{% for cinema in item %}
-  <header>
-    <h1>1+1</h1>
-    <img src="{{ item.image }}" alt="Постер фильма" width="222" height="333">
-  </header>
-  <section>
-    <h2>Информация</h2>
-    <p>Год выпуска: {{ item.year }}</p>
-    <p>Страна выпуска: {{ item.country }}</p>
-    <p>Жанры: {{ item.genre }}</p>
-    <p>Режиссер: ...</p>
-    <p>Продюсер: ...</p>
-    <p>Композитор: ...</p>
-    <p>Возрастное ограничение: {{ item.age_rating }}</p>
-    <p>Длительность: 120 мин</p>
-    <p>Трейлер: <a href="trailer.mp4">Смотреть трейлер</a></p>
-  </section>
-  <section>
-    <h2>Описание</h2>
-    <p>...</p>
-  </section>
-  <section>
+<header>
+    <h1>{{ cinema.label }}</h1>
+</header>
+<div class="movie-details">
+    <div class="movie-poster">
+        <img src="{{ cinema.image }}" alt="Постер фильма">
+    </div>
+    <div class="movie-info">
+        <h2>Информация</h2>
+        <p><strong>Год выпуска:</strong> {{ cinema.year }}</p>
+        <p><strong>Страна выпуска:</strong> {{ cinema.country }}</p>
+        <p><strong>Жанры:</strong> {{ cinema.genre }}</p>
+        <p><strong>Режиссер:</strong> {{ cinema.director.fio }}</p>
+        <p><strong>Продюсер:</strong> {{ cinema.producer.fio }}</p>
+        <p><strong>Композитор:</strong> {{ cinema.composer.fio }}</p>
+        <p><strong>Возрастное ограничение:</strong> {{ cinema.age_rating }}+</p>
+        <p><strong>Длительность:</strong> {{ cinema.trailer_link }}</p>
+        <h2>Описание</h2>
+        <p>{{ cinema.description }}</p>
+    </div>
+</div>
+<div class="movie-trailer">
+    <h2>Трейлер</h2>
+    <iframe width="860" height="315" src="{{ cinema.href }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+<section>
     <h2>Отзывы</h2>
-    <p>...</p>
-  </section>
-{% endfor %}
+    <!-- Отзывы критиков -->
+    <div class="review">
+        <div class="details">
+            <img class="avatar" src="https://on-desktop.com/wps/2020Men___Male_Celebrity_Blue-eyed_actor_Ryan_Gosling_s_expressive_look_147866_.jpg" alt="Критик 1">
+            <div class="kategor">критик</div>
+            <div class="name">Райн Гослинг</div>
+            <div class="rating">9/10</div>
+        </div>
+        <p>Отличный фильм, рекомендую всем!</p>
+    </div>
+
+    <div class="review">
+        <div class="details">
+            <img class="avatar" src="https://цветыкурск.рф/wp-content/uploads/2020/12/2894115461.jpg" alt="Критик 2">
+            <div class="kategor">критик</div>
+            <div class="name">Иван Иванович</div>
+            <div class="rating">8/10</div>
+        </div>
+        <p>Замечательная игра актеров, интересный сюжет.</p>
+    </div>
+
+    <!-- Отзывы обычных людей -->
+    <div class="review">
+        <div class="details">
+            <img class="avatar" src="https://get.wallhere.com/photo/face-women-model-portrait-long-hair-blue-eyes-brunette-looking-at-viewer-photography-blue-fashion-hair-Person-skin-head-girl-beauty-smile-eye-woman-lady-blond-hairstyle-portrait-photography-photo-shoot-brown-hair-facial-expression-41103.jpg" alt="Пользователь 1">
+            <div class="kategor">пользователь</div>
+            <div class="name">Елена Анатольевна</div>
+            <div class="rating">10/10</div>
+        </div>
+        <p>Фильм просто великолепен!</p>
+    </div>
+
+    <div class="review">
+        <div class="details">
+            <img class="avatar" src="https://tehnolog.org/uploads/storage/about/s1200.jpg" alt="Пользователь 2">
+            <div class="kategor">пользователь</div>
+            <div class="name">Андрей Алексеевич</div>
+            <div class="rating">7/10</div>
+        </div>
+        <p>Хороший фильм, но несколько предсказуемый.</p>
+    </div>
+        <div id="userReviews"></div>
+
+    <!-- Форма для оставления отзыва -->
+    <h2>Оставить свой отзыв</h2>
+    <form id="userReviewForm" onsubmit="return submitReview();">
+        <div>
+            <label for="userName">Имя:</label><br>
+            <input type="text" id="userName" name="userName" required><br>
+        </div>
+        <div>
+            <label for="userRating">Оценка (из 10):</label><br>
+            <input type="number" id="userRating" name="userRating" min="1" max="10" required><br>
+        </div>
+        <div>
+            <label for="userReview">Отзыв:</label><br>
+            <textarea id="userReview" name="userReview" required></textarea><br>
+        </div>
+        <button type="submit">Отправить</button>
+    </form>
+</section>
 {% endblock %}
+

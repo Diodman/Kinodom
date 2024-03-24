@@ -6,7 +6,7 @@
     {% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
+    <style>{% block style %}
         .navbar-custom {
             background-color: #FFA500;
         }
@@ -17,6 +17,7 @@
         .navbar-custom .navbar-toggler-icon {
             background-color: black;
         }
+        {% endblock %}
     </style>
 </head>
 <body style="background-color: black;">
@@ -66,62 +67,89 @@
         {% block content2 %}{% endblock %}
     </div>
 
+
+
+
+
     <!-- Bootstrap JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-     document.addEventListener("DOMContentLoaded", function() {
-        var sortBy = document.getElementById('sortBy');
-        sortBy.addEventListener('change', function() {
-            var selectedOption = sortBy.value;
-            sortMovies(selectedOption);
+    <script>
+       $(document).ready(function(){
+    $('#sortBy').change(function(){
+        var selectedOption = $(this).val();
+        sortMovies(selectedOption);
+    });
+
+    function sortMovies(option){
+        var container = $('#moviesContainer');
+        var movies = container.children('.card').toArray();
+
+        movies.sort(function(a, b){
+            var aValue = $(a).find('.card-body').attr('data-' + option);
+            var bValue = $(b).find('.card-body').attr('data-' + option);
+
+if($(a).find('.card-body').attr('data-title') !== undefined){
+    return $(a).find('.card-body').attr('data-title').localeCompare($(b).find('.card-body').attr('data-title'));
+} else {
+    return 0;
+}
+
+
+            if(option === 'title'){
+                return aValue.localeCompare(bValue);
+            } else {
+                return parseFloat(bValue) - parseFloat(aValue);
+            }
         });
 
-        function sortMovies(option) {
-            var container = document.getElementById('moviesContainer');
-            var movies = Array.from(container.querySelectorAll('.card'));
+        container.empty().append(movies);
+    }
+});
 
-            if (option === 'no') {
-                // Вывод карточек в порядке их номеров от 1 до 5 (Пока что оставлю так, по возможности как-то изменить)
-                movies.sort(function(a, b) {
-                    var aValue = parseInt(a.dataset.number);
-                    var bValue = parseInt(b.dataset.number);
-                    return aValue - bValue;
-                });
-            } else
-                movies.sort(function(a, b) {
-                    var aValue, bValue;
 
-                    switch(option) {
-                        case 'title':
-                            aValue = a.querySelector('.card-title').textContent.toLowerCase();
-                            bValue = b.querySelector('.card-title').textContent.toLowerCase();
-                            return aValue.localeCompare(bValue);
-                        case 'rating':
-                            aValue = parseFloat(a.dataset.rating);
-                            bValue = parseFloat(b.dataset.rating);
-                            return bValue - aValue;
-                        case 'votes':
-                            aValue = parseInt(a.dataset.votes);
-                            bValue = parseInt(b.dataset.votes);
-                            return bValue - aValue;
-                        case 'newest':
-                        case 'oldest':
-                            aValue = parseInt(a.dataset.year);
-                            bValue = parseInt(b.dataset.year);
-                            return option === 'newest' ? bValue - aValue : aValue - bValue;
-                        default:
-                            return 0;
-                    }
-                });
-            }
+    </script>
 
-            movies.forEach(function(movie) {
-                container.appendChild(movie);
-            });
+
+<script>
+        function submitReview() {
+            var userName = document.getElementById("userName").value;
+            var userRating = document.getElementById("userRating").value;
+            var userReview = document.getElementById("userReview").value;
+
+            var reviewDiv = document.createElement("div");
+            reviewDiv.classList.add("review");
+
+            var detailsDiv = document.createElement("div");
+            detailsDiv.classList.add("details");
+
+            var avatarImg = document.createElement("img");
+            avatarImg.classList.add("avatar");
+            avatarImg.src = "https://mykaleidoscope.ru/x/uploads/posts/2022-10/1666240926_15-mykaleidoscope-ru-p-grustnii-i-veselii-chelovek-instagram-20.jpg";
+            avatarImg.alt = userName;
+
+            var nameDiv = document.createElement("div");
+            nameDiv.classList.add("name");
+            nameDiv.textContent = userName;
+
+            var ratingDiv = document.createElement("div");
+            ratingDiv.classList.add("rating");
+            ratingDiv.textContent = userRating + "/10";
+
+            detailsDiv.appendChild(avatarImg);
+            detailsDiv.appendChild(nameDiv);
+            detailsDiv.appendChild(ratingDiv);
+
+            var reviewText = document.createElement("p");
+            reviewText.textContent = userReview;
+
+            reviewDiv.appendChild(detailsDiv);
+            reviewDiv.appendChild(reviewText);
+
+            document.getElementById("userReviews").appendChild(reviewDiv);
+             return false;
         }
-     });
     </script>
 
 </body>
