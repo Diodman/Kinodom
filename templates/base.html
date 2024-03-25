@@ -42,16 +42,22 @@
                 <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Найти</button>
             </form>
             <ul class="navbar-nav ml-auto">
+                {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/Vhod">Вход</a>
+                    <a class="nav-link" href="/log">Выход</a>
+                </li>
+                <li class="nav-item">
+                    <p class="nav-link">Привет, {{ current_user.login }}</p>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Вход</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/Register">Регистрация</a>
                 </li>
+                {% endif %}
             </ul>
-            {% if current_user.is_authenticated %}
-            <p>Name: {{current_user.login}}</p>
-            {% endif %}
         </div>
     </nav>
 

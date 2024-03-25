@@ -32,9 +32,9 @@ class Cinema(Base):
     producer_id = Column(Integer, ForeignKey('WorkingFilms.id'))
     composer_id = Column(Integer, ForeignKey('WorkingFilms.id'))
 
-    director = relationship("WorkingFilms", primaryjoin="Cinema.director_id == foreign(WorkingFilms.id)")
-    producer = relationship("WorkingFilms", primaryjoin="Cinema.producer_id == foreign(WorkingFilms.id)")
-    composer = relationship("WorkingFilms", primaryjoin="Cinema.composer_id == foreign(WorkingFilms.id)")
+    director = relationship("WorkingFilms", foreign_keys="Cinema.director_id")#primaryjoin="Cinema.director_id == foreign(WorkingFilms.id)")
+    producer = relationship("WorkingFilms", foreign_keys="Cinema.producer_id")
+    composer = relationship("WorkingFilms", foreign_keys="Cinema.composer_id")
 
     image = Column(String(500), nullable=False, default="")
     href = Column(String(100), nullable=False, default="")

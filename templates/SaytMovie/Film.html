@@ -132,7 +132,7 @@
     <div class="review">
         <div class="details">
             <img class="avatar" src="https://on-desktop.com/wps/2020Men___Male_Celebrity_Blue-eyed_actor_Ryan_Gosling_s_expressive_look_147866_.jpg" alt="Критик 1">
-            <div class="kategor">критик</div>
+            <div class="kategor">критик </div>
             <div class="name">Райн Гослинг</div>
             <div class="rating">9/10</div>
         </div>
@@ -142,7 +142,7 @@
     <div class="review">
         <div class="details">
             <img class="avatar" src="https://цветыкурск.рф/wp-content/uploads/2020/12/2894115461.jpg" alt="Критик 2">
-            <div class="kategor">критик</div>
+            <div class="kategor">критик </div>
             <div class="name">Иван Иванович</div>
             <div class="rating">8/10</div>
         </div>
@@ -153,7 +153,7 @@
     <div class="review">
         <div class="details">
             <img class="avatar" src="https://get.wallhere.com/photo/face-women-model-portrait-long-hair-blue-eyes-brunette-looking-at-viewer-photography-blue-fashion-hair-Person-skin-head-girl-beauty-smile-eye-woman-lady-blond-hairstyle-portrait-photography-photo-shoot-brown-hair-facial-expression-41103.jpg" alt="Пользователь 1">
-            <div class="kategor">пользователь</div>
+            <div class="kategor">пользователь </div>
             <div class="name">Елена Анатольевна</div>
             <div class="rating">10/10</div>
         </div>
@@ -163,21 +163,35 @@
     <div class="review">
         <div class="details">
             <img class="avatar" src="https://tehnolog.org/uploads/storage/about/s1200.jpg" alt="Пользователь 2">
-            <div class="kategor">пользователь</div>
+            <div class="kategor">пользователь </div>
             <div class="name">Андрей Алексеевич</div>
             <div class="rating">7/10</div>
         </div>
         <p>Хороший фильм, но несколько предсказуемый.</p>
     </div>
+    {% for reviews in reviews %}
+    <div class="review">
+        <div class="details">
+            <img class="avatar" src="https://klike.net/uploads/posts/2023-01/1674365371_3-34.jpg" alt="Пользователь 2">
+            <div class="kategor">пользователь </div>
+            <div class="name">{{ reviews.name }}</div>
+            <div class="rating">{{ reviews.number }}/10</div>
+        </div>
+        <p>{{ reviews.mail_comer }}</p>
+    </div>
+    {% endfor %}
         <div id="userReviews"></div>
 
+    {% if current_user.is_authenticated %}
     <!-- Форма для оставления отзыва -->
     <h2>Оставить свой отзыв</h2>
-    <form id="userReviewForm" onsubmit="return submitReview();">
-        <div>
+    <!-- onsubmit="return submitReview();"-->
+    <form id="userReviewForm" action="/Film/{{cinema.id}}/" method="post" >
+        <input type="hidden" name="id" value= "{{cinema.id}}">
+        <!--<div>
             <label for="userName">Имя:</label><br>
             <input type="text" id="userName" name="userName" required><br>
-        </div>
+        </div>-->
         <div>
             <label for="userRating">Оценка (из 10):</label><br>
             <input type="number" id="userRating" name="userRating" min="1" max="10" required><br>
@@ -188,6 +202,11 @@
         </div>
         <button type="submit">Отправить</button>
     </form>
+{% else %}
+    <p>Чтобы оставить отзыв, пожалуйста, <a href="/Vhod">войдите</a> или <a href="/Register">зарегистрируйтесь</a>.</p>
+{% endif %}
+
+
 </section>
 {% endblock %}
 
