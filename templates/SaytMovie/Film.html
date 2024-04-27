@@ -172,7 +172,7 @@
     {% for reviews in reviews %}
     <div class="review">
         <div class="details">
-            <img class="avatar" src="https://klike.net/uploads/posts/2023-01/1674365371_3-34.jpg" alt="Пользователь 2">
+            <img class="avatar" src="https://avatars.mds.yandex.net/i?id=01595eb1214bb37133a943449a4f1a2a1cc86d7e-9570000-images-thumbs&n=13" alt="Пользователь 2">
             <div class="kategor">пользователь </div>
             <div class="name">{{ reviews.name }}</div>
             <div class="rating">{{ reviews.number }}/10</div>
@@ -194,16 +194,16 @@
         </div>-->
         <div>
             <label for="userRating">Оценка (из 10):</label><br>
-            <input type="number" id="userRating" name="userRating" min="1" max="10" required><br>
+            <input type="number" id="userRating" name="userRating" min="1" max="10" required value="{{ raiting.number}}"><br>
         </div>
         <div>
             <label for="userReview">Отзыв:</label><br>
             <textarea id="userReview" name="userReview" required></textarea><br>
         </div>
-        <button type="submit">Отправить</button>
+        <button id="forma">Отправить</button>
     </form>
 {% else %}
-    <p>Чтобы оставить отзыв, пожалуйста, <a href="/Vhod">войдите</a> или <a href="/Register">зарегистрируйтесь</a>.</p>
+    <p>Чтобы оставить отзыв, пожалуйста, <a href="/login">войдите</a> или <a href="/Register">зарегистрируйтесь</a>.</p>
 {% endif %}
 
 

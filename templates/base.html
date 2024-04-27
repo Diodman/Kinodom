@@ -47,7 +47,7 @@
                     <a class="nav-link" href="/log">Выход</a>
                 </li>
                 <li class="nav-item">
-                    <p class="nav-link">Привет, {{ current_user.login }}</p>
+                    <a href="/Profily" class="nav-link">Привет, {{ current_user.login }}</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
@@ -82,81 +82,52 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-       $(document).ready(function(){
-    $('#sortBy').change(function(){
-        var selectedOption = $(this).val();
-        sortMovies(selectedOption);
+       document.addEventListener('DOMContentLoaded', function () {
+    var sortBySelect = document.getElementById('sortBy');
+
+    sortBySelect.addEventListener('change', function () {
+        var selectedOption = sortBySelect.value;
+        if (selectedOption !== 'no') {
+            fetchMovies(selectedOption);
+        }
     });
 
-    function sortMovies(option){
-        var container = $('#moviesContainer');
-        var movies = container.children('.card').toArray();
-
-        movies.sort(function(a, b){
-            var aValue = $(a).find('.card-body').attr('data-' + option);
-            var bValue = $(b).find('.card-body').attr('data-' + option);
-
-if($(a).find('.card-body').attr('data-title') !== undefined){
-    return $(a).find('.card-body').attr('data-title').localeCompare($(b).find('.card-body').attr('data-title'));
-} else {
-    return 0;
-}
-
-
-            if(option === 'title'){
-                return aValue.localeCompare(bValue);
-            } else {
-                return parseFloat(bValue) - parseFloat(aValue);
-            }
-        });
-
-        container.empty().append(movies);
+    function fetchMovies(sortBy) {
+        fetch('/api/movies?sortBy=' + sortBy)
+            .then(response => response.json())
+            .then(data => {
+                // Обработка полученных данных (например, обновление списка фильмов на странице)
+                console.log(data); // Вывод данных в консоль для отладки
+            })
+            .catch(error => {
+                console.error('Ошибка при получении фильмов:', error);
+            });
     }
 });
 
-
     </script>
 
 
+
+
+
+<!--Каптча для проверки на робота-->
 <script>
-        function submitReview() {
-            var userName = document.getElementById("userName").value;
-            var userRating = document.getElementById("userRating").value;
-            var userReview = document.getElementById("userReview").value;
-
-            var reviewDiv = document.createElement("div");
-            reviewDiv.classList.add("review");
-
-            var detailsDiv = document.createElement("div");
-            detailsDiv.classList.add("details");
-
-            var avatarImg = document.createElement("img");
-            avatarImg.classList.add("avatar");
-            avatarImg.src = "https://mykaleidoscope.ru/x/uploads/posts/2022-10/1666240926_15-mykaleidoscope-ru-p-grustnii-i-veselii-chelovek-instagram-20.jpg";
-            avatarImg.alt = userName;
-
-            var nameDiv = document.createElement("div");
-            nameDiv.classList.add("name");
-            nameDiv.textContent = userName;
-
-            var ratingDiv = document.createElement("div");
-            ratingDiv.classList.add("rating");
-            ratingDiv.textContent = userRating + "/10";
-
-            detailsDiv.appendChild(avatarImg);
-            detailsDiv.appendChild(nameDiv);
-            detailsDiv.appendChild(ratingDiv);
-
-            var reviewText = document.createElement("p");
-            reviewText.textContent = userReview;
-
-            reviewDiv.appendChild(detailsDiv);
-            reviewDiv.appendChild(reviewText);
-
-            document.getElementById("userReviews").appendChild(reviewDiv);
-             return false;
+    // Функция для обработки сообщения от iframe
+    function handleMessage(event) {
+        // Проверяем, что сообщение содержит нужный тип
+        if (event.data === 'activna') {
+            // Активируем кнопку Зарегистрироваться
+            document.getElementById('registerButton').removeAttribute('disabled');
+            document.getElementById('registerButton').classList.add('active');
         }
-    </script>
+    }
+
+    // Добавляем слушатель событий для получения сообщений от iframe
+    window.addEventListener('message', handleMessage);
+</script>
+
+
 
 </body>
 </html>

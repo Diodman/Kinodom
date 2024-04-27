@@ -4,7 +4,7 @@ import uuid
 import settings
 from flask_login import LoginManager, login_required, current_user
 from flask import Flask, g, render_template
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify, flash, redirect, url_for
 
 
 
@@ -25,6 +25,7 @@ def TopMovie():
     from models import db_session, Cinema, WorkingFilms, ParticationCinema
     cinemas = db_session.query(Cinema).filter(Cinema.cinema_option == 'False').order_by(Cinema.note.desc()).limit(5).all()
     return render_template('MovieSelections/TopMovie.html', cinemas=cinemas, show_movies=SHOW_MOVIES)
+
 
 @app.route('/NewMovie')
 def NewMovie():
@@ -53,8 +54,11 @@ def Film_by_id(id):
     from models import db_session, Cinema, WorkingFilms, Reviews
     cinema = db_session.query(Cinema).filter(Cinema.id == id).first()
     reviews = db_session.query(Reviews).filter(Reviews.mail_obrash == id).all()
+    raiting = None
+    if current_user.is_authenticated:
+        raiting = db_session.query(Reviews).filter(Reviews.name == current_user.login, Reviews.mail_obrash == id).first()
     app.logger.info(cinema.director)
-    return render_template('SaytMovie/Film.html', cinema=cinema, reviews=reviews)
+    return render_template('SaytMovie/Film.html', cinema=cinema, reviews=reviews, raiting=raiting)
 
 
 @app.route("/Film/<int:id>/", methods=["POST"])
@@ -77,13 +81,23 @@ def add_review(id):
         new_review = Reviews(name=user_name, mail_comer=mail_comer, mail_obrash=mail_obrash,
                              href1=href1, href2=href2, href3=href3, number=number)
         db_session.add(new_review)
+
+            # Получаем все отзывы пользователя
+        user_reviews = Reviews.query.filter_by(name=user_name).all()
+
+        # Обновляем оценку у всех комментариев пользователя
+        for review in user_reviews:
+            review.number = number
         db_session.commit()
 
-        return """
-            <script>
-                window.location.href = window.location.href;
-            </script>
-            """
+        return  """
+        < script >
+    function refreshPage() {
+    window.location.reload();
+}
+    < / script >
+    """
+
     else:
         return 'Метод GET не поддерживается для этого маршрута', 405
 
@@ -145,6 +159,70 @@ def find_news_by_get(id):
 @manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+@app.route('/Captcha')
+def Captcha():
+    return render_template('captcha.html', )
+
+@app.route('/Profily')
+@login_required
+def Profily():
+    from models import db_session, User
+    user_name = current_user.login
+    user_profile_picture = current_user.profile_picture  # Получаем путь к фото профиля пользователя
+    return render_template('SaytMovie/Profily.html', user_name=user_name, user_profile_picture=user_profile_picture)
+
+
+
+# Папка для сохранения загруженных изображений
+UPLOAD_FOLDER = 'D:\Programming\Kinodom(web)/flask_project/static'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+from werkzeug.utils import secure_filename
+
+# Здесь можно определить разрешенные типы файлов, если требуется
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Функция для проверки разрешенных типов файлов
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Затем используйте эти переменные в вашем коде
+
+
+@app.route('/upload_profile_picture', methods=['POST'])
+@login_required
+def upload_profile_picture():
+    from models import db_session, User
+    file = request.files['profilePicture']
+    if ('profilePicture' not in request.files) and (file.filename == ''):
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        current_user.profile_picture = os.path.join(UPLOAD_FOLDER, filename)
+        flash('File uploaded successfully')
+    new_username = request.form.get('newUsername')  # Получаем новое имя пользователя из формы
+    current_user.login = new_username  # Обновляем имя текущего пользователя
+    db_session.commit()  # Сохраняем изменения в базе данных
+    return redirect(url_for('Profily'))
+
+@app.route("/update_username", methods=["GET"])
+def update_username_get():
+    return 'Метод GET не поддерживается для этого маршрута', 405  # Возвращаем сообщение об ошибке для GET запросов
+
+
+from flask import send_file
+
+@app.route('/get_profile_picture/<int:user_id>')
+def get_profile_picture(user_id):
+    from models import db_session, User
+    user = db_session.query(User).get(user_id)
+    if user:
+        # Предположим, что изображение хранится в поле profile_picture модели User
+        return send_file(user.profile_picture, mimetype='image/jpeg')  # Используйте правильный MIME-тип для вашего изображения
+    else:
+        return 'Изображение не найдено', 404
 
 
 if __name__ == "__main__":

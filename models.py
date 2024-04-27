@@ -96,6 +96,7 @@ class User(Base, UserMixin):
     id = Column(Integer, primary_key=True)
     login = Column(String(32), unique=True)
     password = Column(String(64))
+    profile_picture = Column(String(255))
 
 
 def init_db():

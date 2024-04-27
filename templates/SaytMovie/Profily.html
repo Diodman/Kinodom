@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Кинодом{% endblock %}
+{% block style %}
+.navbar-custom {
+    background-color: #FFA500;
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .btn-outline-light {
+    color: black;
+}
+.navbar-custom .navbar-toggler-icon {
+    background-color: black;
+}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+        .edit-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 20% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+{% endblock %}
+
+{% block content %}
+<body>
+
+<div class="container">
+    <h1>Профиль</h1>
+    <img id="userAvatar" src="{{ url_for('get_profile_picture', user_id=current_user.id) }}" alt="User Avatar" class="avatar">
+    <div id="username" class="username">{{ user_name }}</div>
+    <img id="editIcon" src="https://agrofor.ru/wp-content/uploads/2019/06/mechanical-01.png" alt="Edit Icon" class="edit-icon" onclick="editProfile()">
+</div>
+
+<!-- Modal for Editing Profile -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Редактор профиля</h2>
+<form id="profileForm" method="POST" action="/upload_profile_picture" enctype="multipart/form-data">
+    <label for="newUsername">Новое имя пользователя:</label>
+    <input type="text" id="newUsername" name="newUsername" required value="{{user_name}}">
+    <br><br>
+    <label for="profilePicture">Новое фото профиля:</label>
+    <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+    <br><br>
+    <button type="submit">Сохранить изменения</button>
+</form>
+
+    </div>
+</div>
+
+<script>
+    function editProfile() {
+        var modal = document.getElementById("editModal");
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        var modal = document.getElementById("editModal");
+        modal.style.display = "none";
+    }
+
+    function saveChanges() {
+    var newUsername = document.getElementById("newUsername").value;
+    var newAvatar = document.getElementById("newAvatar").files[0]; // Получаем файл изображения
+
+    var formData = new FormData();
+    formData.append('newUsername', newUsername);
+    formData.append('profilePicture', newAvatar); // Добавляем изображение в FormData
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload_profile_picture');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            console.log('Изменения сохранены');
+        } else {
+            console.log('Произошла ошибка при сохранении изменений');
+        }
+    };
+    xhr.send(formData);
+
+    closeModal();
+    return false;
+}
+</script>
+
+
+
+
+</body>
+{% endblock %}
