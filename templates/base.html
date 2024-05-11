@@ -38,8 +38,8 @@
                 </li>
             </ul>
             <form class="form-inline ml-auto">
-                <input class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Поиск">
-                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Найти</button>
+                <input class="form-control mr-sm-2" type="search" id="searchInput" placeholder="Поиск" aria-label="Поиск">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="button" onclick="searchMovies()">Найти</button>
             </form>
             <ul class="navbar-nav ml-auto">
                 {% if current_user.is_authenticated %}
@@ -62,7 +62,7 @@
     </nav>
 
     <!-- Основной контент -->
-     <div class="container">
+     <div id="searchResults" class="container">
         {% block content %}
             {% if show_movies %}
                 {% include "SortirovkaKino.html" %}
@@ -126,6 +126,73 @@
     // Добавляем слушатель событий для получения сообщений от iframe
     window.addEventListener('message', handleMessage);
 </script>
+
+<!-- JavaScript для поиска фильмов -->
+<script>
+    function searchMovies() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) {
+            return;
+        }
+
+        fetch(`/search?query=${query}`)
+            .then(response => response.json())
+            .then(movies => {
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = ''; // Очищаем результаты поиска
+
+                if (movies.length === 0) {
+                    resultsDiv.innerHTML = '<p>Фильмы не найдены</p>';
+                    const backButton = document.createElement('button');
+                    backButton.textContent = 'Вернуться назад';
+                    backButton.classList.add('btn', 'btn-outline-light');
+                    backButton.onclick = function() {
+                        window.location.reload(); // Обновляем страницу
+                    };
+                    resultsDiv.appendChild(backButton);
+                    return;
+                }
+
+                // Если фильмы найдены, создаем карточки для каждого фильма
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.classList.add('card', 'mb-3');
+                    movieCard.innerHTML = `
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <img src="${movie.image}" class="card-img" alt="${movie.label}" width="150" height="304">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">${movie.label}</h5>
+                                    <p class="card-text">Год выпуска: ${movie.year}</p>
+                                    <p class="card-text">Страна: ${movie.country}</p>
+                                    <p class="card-text">Жанр: ${movie.genre}</p>
+                                    <p class="card-text">Возрастной рейтинг: ${movie.age_rating}</p>
+                                    <p class="card-text">Время: ${movie.trailer_link}</p>
+                                    <p class="card-text">Рейтинг: ${movie.note}</p>
+                                    <a href="${movie.link}" class="btn btn-primary">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.appendChild(movieCard);
+                     const backButton = document.createElement('button');
+                    backButton.textContent = 'Вернуться назад';
+                    backButton.classList.add('btn', 'btn-outline-light');
+                    backButton.onclick = function() {
+                        window.location.reload(); // Обновляем страницу
+                    };
+                    resultsDiv.appendChild(backButton);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка при выполнении поиска:', error);
+            });
+    }
+</script>
+
+
 
 
 

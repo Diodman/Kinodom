@@ -78,7 +78,7 @@
 
 <div class="container">
     <h1>Профиль</h1>
-    <img id="userAvatar" src="{{ url_for('get_profile_picture', user_id=current_user.id) }}" alt="User Avatar" class="avatar">
+<img id="userAvatar" src="{{ url_for('static', filename=current_user.profile_picture, user_id=current_user.id) }}" alt="User Avatar" class="avatar">
     <div id="username" class="username">{{ user_name }}</div>
     <img id="editIcon" src="https://agrofor.ru/wp-content/uploads/2019/06/mechanical-01.png" alt="Edit Icon" class="edit-icon" onclick="editProfile()">
 </div>

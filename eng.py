@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import uuid
+
 import settings
 from flask_login import LoginManager, login_required, current_user
 from flask import Flask, g, render_template
@@ -26,6 +27,34 @@ def TopMovie():
     cinemas = db_session.query(Cinema).filter(Cinema.cinema_option == 'False').order_by(Cinema.note.desc()).limit(5).all()
     return render_template('MovieSelections/TopMovie.html', cinemas=cinemas, show_movies=SHOW_MOVIES)
 
+@app.route('/search')
+def search_movies():
+    from flask import Flask, request, jsonify, render_template
+    from models import db_session, Cinema  # Подставьте нужные импорты моделей
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify([])
+
+    # Используем запрос к базе данных для поиска фильмов
+    cinemas = db_session.query(Cinema).filter(Cinema.label.ilike(f'%{query}%')).all()
+
+    # Собираем данные о фильмах
+    movies_data = []
+    for cinema in cinemas:
+        movie_data = {
+            'image': cinema.image,
+            'label': cinema.label,
+            'year': cinema.year,
+            'country': cinema.country,
+            'genre': cinema.genre,
+            'age_rating': cinema.age_rating,
+            'trailer_link': cinema.trailer_link,
+            'note': cinema.note,
+            'link': url_for('Film_by_id', id=cinema.id)
+        }
+        movies_data.append(movie_data)
+
+    return jsonify(movies_data)
 
 @app.route('/NewMovie')
 def NewMovie():
@@ -65,21 +94,23 @@ def Film_by_id(id):
 @login_required
 def add_review(id):
     from models import db_session, Reviews
+    from flask import make_response, redirect
     if request.method == 'POST':
         # Получаем имя текущего авторизованного пользователя
         user_name = current_user.login
+        user_img = current_user.profile_picture
 
         # Получаем остальные данные из формы
         mail_comer = request.form.get('userReview')
         mail_obrash = request.form.get('id')
-        href1 = request.form.get('#')
+        href1 = request.form.get('user_img')
         href2 = request.form.get('#')
         href3 = request.form.get('#')
         number = request.form.get('userRating', 10, type=int)
 
         # Создаем новый объект Review и добавляем его в базу данных
         new_review = Reviews(name=user_name, mail_comer=mail_comer, mail_obrash=mail_obrash,
-                             href1=href1, href2=href2, href3=href3, number=number)
+                             href1=user_img, href2=href2, href3=href3, number=number)
         db_session.add(new_review)
 
             # Получаем все отзывы пользователя
@@ -90,13 +121,10 @@ def add_review(id):
             review.number = number
         db_session.commit()
 
-        return  """
-        < script >
-    function refreshPage() {
-    window.location.reload();
-}
-    < / script >
-    """
+        # Устанавливаем куки, чтобы пометить форму как отправленную
+        response = make_response(redirect(request.url))
+        response.set_cookie('form_submitted', 'true')
+        return response
 
     else:
         return 'Метод GET не поддерживается для этого маршрута', 405
@@ -200,7 +228,7 @@ def upload_profile_picture():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        current_user.profile_picture = os.path.join(UPLOAD_FOLDER, filename)
+        current_user.profile_picture = os.path.join(filename)
         flash('File uploaded successfully')
     new_username = request.form.get('newUsername')  # Получаем новое имя пользователя из формы
     current_user.login = new_username  # Обновляем имя текущего пользователя
